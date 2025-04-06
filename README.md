@@ -1,4 +1,4 @@
-# CRM AI Assistant
+# Next Generation Agent
 
 A modern CRM system with integrated AI capabilities using GPT-4 for intelligent customer insights and automation.
 
