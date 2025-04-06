@@ -4,13 +4,13 @@ A modern CRM system with integrated AI capabilities using GPT-4 for intelligent 
 
 ## Features
 
-- 🤖 AI-powered customer insights
-- 📊 360° customer view
-- 📈 Smart case management
-- 💬 Intelligent chatbot interface
-- 🔍 Natural language querying
-- 📱 Responsive design
-- 🔒 Secure data handling
+- AI-powered customer insights
+- 360° customer view
+- Smart case management
+- Intelligent chatbot interface
+- Natural language querying
+- Responsive design
+- Secure data handling
 
 ## Tech Stack
 
