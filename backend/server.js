@@ -85,9 +85,6 @@ const connectDB = async () => {
   }
 };
 
-// Connect to MongoDB
-await connectDB();
-
 // Debug middleware to log requests
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
@@ -124,15 +121,25 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 5001;
 
-// Check if port is in use and handle gracefully
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}).on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use. Please choose a different port or kill the process using that port.`);
-    process.exit(1);
-  } else {
-    console.error('Server error:', err);
+// Start the server
+const startServer = async () => {
+  try {
+    await connectDB();
+    const server = app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Please choose a different port or kill the process using that port.`);
+        process.exit(1);
+      } else {
+        console.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
-}); 
+};
+
+startServer(); 
