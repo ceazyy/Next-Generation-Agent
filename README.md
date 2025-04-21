@@ -1,6 +1,6 @@
 # Next Generation Agent
 
-A modern CRM system with integrated AI capabilities using GPT-4 for intelligent customer insights and automation.
+A modern CRM system with integrated AI capabilities using GPT-4 for intelligent customer insights and automation. Newer version is under development, as for hosting it, I'm can't really do it because I'm learning deployment :3 
 
 ## Features
 
