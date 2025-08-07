@@ -1,6 +1,6 @@
 # Next Generation Agent
 
-A modern CRM system with integrated AI capabilities using GPT-4 for intelligent customer insights and automation. Newer version is under development, as for hosting it, I'm can't really do it because I'm learning deployment :3 
+A modern CRM system with integrated AI capabilities using GPT-4 for intelligent customer insights and automation. Now using Supabase for all backend data and auth, and ready for Vercel deployment.
 
 ## Features
 
@@ -15,8 +15,8 @@ A modern CRM system with integrated AI capabilities using GPT-4 for intelligent 
 ## Tech Stack
 
 - Backend:
-  - Node.js + Express
-  - MongoDB for data storage
+  - Node.js + Express (API routes)
+  - Supabase (Postgres, Auth, Storage)
   - LangChain for AI orchestration
   - GPT-4 for natural language processing
   - Vector storage for semantic search
@@ -31,7 +31,7 @@ A modern CRM system with integrated AI capabilities using GPT-4 for intelligent 
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- MongoDB (v4.4 or higher)
+- Supabase project (get your API keys from the Supabase dashboard)
 - OpenAI API key
 - npm or yarn
 
@@ -59,7 +59,7 @@ A modern CRM system with integrated AI capabilities using GPT-4 for intelligent 
    # In the backend directory
    cp .env.example .env
    ```
-   Edit the `.env` file with your configuration values.
+   Edit the `.env` file with your Supabase and OpenAI configuration values.
 
 4. Start the development servers:
    ```bash
@@ -67,12 +67,26 @@ A modern CRM system with integrated AI capabilities using GPT-4 for intelligent 
    npm run dev
 
    # Start frontend server (from frontend directory)
-   npm run serve
+   npm run dev
    ```
 
 5. Access the application:
-   - Frontend: http://localhost:8080
+   - Frontend: http://localhost:5173
    - Backend API: http://localhost:5000
+
+## Supabase Setup
+
+- Create a Supabase project at https://supabase.com/
+- Create tables: `accounts`, `contacts`, `leads`, `opportunities`, `tasks` (matching your data model needs)
+- Enable authentication (email/password)
+- Get your Supabase URL and Service Key from the dashboard
+- Add them to your `.env` file as `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
+
+## Vercel Deployment
+
+- The backend is ready for Vercel serverless deployment (see `vercel.json` for configuration)
+- Set all environment variables in your Vercel project settings
+- Deploy frontend and backend as separate Vercel projects or as a monorepo
 
 ## AI Features Usage
 
@@ -100,7 +114,7 @@ The system uses:
 ## Security Considerations
 
 - All API keys should be stored in environment variables
-- JWT authentication for API endpoints
+- Supabase Auth for API endpoints
 - Data privacy controls in AI responses
 - Rate limiting on API endpoints
 - Input validation and sanitization

@@ -1,115 +1,42 @@
 import express from 'express';
-import Account from '../models/Account.js';
+import { supabase } from '../services/supabaseClient.js';
 import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get all accounts with search and filtering
+// Get all accounts
 router.get('/', auth, async (req, res) => {
-  try {
-    const { search, status, industry } = req.query;
-    const query = {};
-
-    // Search in name or location
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { location: { $regex: search, $options: 'i' } },
-        { industry: { $regex: search, $options: 'i' } }
-      ];
-    }
-
-    // Filter by status
-    if (status) {
-      query.status = status;
-    }
-
-    // Filter by industry
-    if (industry) {
-      query.industry = industry;
-    }
-
-    const accounts = await Account.find(query)
-      .populate('primaryContact', 'firstName lastName email')
-      .populate('assignedTo', 'name email')
-      .sort({ createdAt: -1 });
-
-    res.json(accounts);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching accounts', error: error.message });
-  }
+  const { data, error } = await supabase.from('accounts').select('*');
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
-// Get a single account
+// Get a single account by id
 router.get('/:id', auth, async (req, res) => {
-  try {
-    const account = await Account.findById(req.params.id)
-      .populate('primaryContact', 'firstName lastName email')
-      .populate('assignedTo', 'name email');
-    
-    if (!account) {
-      return res.status(404).json({ message: 'Account not found' });
-    }
-    
-    res.json(account);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching account', error: error.message });
-  }
+  const { data, error } = await supabase.from('accounts').select('*').eq('id', req.params.id).single();
+  if (error) return res.status(404).json({ error: error.message });
+  res.json(data);
 });
 
 // Create a new account
 router.post('/', auth, async (req, res) => {
-  try {
-    const account = new Account({
-      ...req.body,
-      assignedTo: req.body.assignedTo || req.user._id
-    });
-
-    await account.save();
-    await account.populate([
-      { path: 'primaryContact', select: 'firstName lastName email' },
-      { path: 'assignedTo', select: 'name email' }
-    ]);
-    
-    res.status(201).json(account);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating account', error: error.message });
-  }
+  const { data, error } = await supabase.from('accounts').insert([req.body]).single();
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(201).json(data);
 });
 
 // Update an account
 router.put('/:id', auth, async (req, res) => {
-  try {
-    const account = await Account.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).populate('primaryContact', 'firstName lastName email')
-      .populate('assignedTo', 'name email');
-
-    if (!account) {
-      return res.status(404).json({ message: 'Account not found' });
-    }
-
-    res.json(account);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating account', error: error.message });
-  }
+  const { data, error } = await supabase.from('accounts').update(req.body).eq('id', req.params.id).single();
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
 });
 
 // Delete an account
 router.delete('/:id', auth, async (req, res) => {
-  try {
-    const account = await Account.findByIdAndDelete(req.params.id);
-
-    if (!account) {
-      return res.status(404).json({ message: 'Account not found' });
-    }
-
-    res.json({ message: 'Account deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting account', error: error.message });
-  }
+  const { error } = await supabase.from('accounts').delete().eq('id', req.params.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(204).send();
 });
 
 export default router; 
