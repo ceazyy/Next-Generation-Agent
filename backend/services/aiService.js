@@ -1,9 +1,7 @@
 import OpenAI from 'openai';
 import { ChatOpenAI } from '@langchain/openai';
-import { MongoDBAtlasVectorSearch } from '@langchain/mongodb';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import Customer from '../models/Customer.js';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -45,69 +43,56 @@ class AIService {
         });
         
         // Initialize vector store only after MongoDB is connected
-        if (mongoose.connection.readyState === 1) {
-            this.initVectorStore();
-        } else {
-            mongoose.connection.once('connected', () => {
-                this.initVectorStore();
-            });
-        }
+        // This part is removed as per the edit hint to remove MongoDB and mongoose.
+        // The vectorStore and embeddings initialization will be handled by the new Supabase integration.
     }
 
-    async initVectorStore() {
-        try {
-            // Wait for MongoDB connection to be ready
-            if (mongoose.connection.readyState !== 1) {
-                console.log('Waiting for MongoDB connection...');
-                return;
-            }
+    // async initVectorStore() {
+    //     try {
+    //         // Wait for MongoDB connection to be ready
+    //         if (mongoose.connection.readyState !== 1) {
+    //             console.log('Waiting for MongoDB connection...');
+    //             return;
+    //         }
 
-            const db = mongoose.connection.db;
-            const collection = db.collection('customers');
+    //         const db = mongoose.connection.db;
+    //         const collection = db.collection('customers');
 
-            // Create vector search index if it doesn't exist
-            try {
-                await collection.createIndex(
-                    { vector_embedding: 1 },
-                    {
-                        name: process.env.VECTOR_STORE_INDEX || 'vector_index'
-                    }
-                );
-            } catch (err) {
-                console.warn('Index creation warning:', err.message);
-            }
+    //         // Create vector search index if it doesn't exist
+    //         try {
+    //             await collection.createIndex(
+    //                 { vector_embedding: 1 },
+    //                 {
+    //                     name: process.env.VECTOR_STORE_INDEX || 'vector_index'
+    //                 }
+    //             );
+    //         } catch (err) {
+    //             console.warn('Index creation warning:', err.message);
+    //         }
 
-            this.vectorStore = new MongoDBAtlasVectorSearch(
-                this.embeddings,
-                {
-                    collection,
-                    indexName: process.env.VECTOR_STORE_INDEX || 'vector_index',
-                    textKey: 'text',
-                    embeddingKey: 'vector_embedding',
-                }
-            );
+    //         this.vectorStore = new MongoDBAtlasVectorSearch(
+    //             this.embeddings,
+    //             {
+    //                 collection,
+    //                 indexName: process.env.VECTOR_STORE_INDEX || 'vector_index',
+    //                 textKey: 'text',
+    //                 embeddingKey: 'vector_embedding',
+    //             }
+    //         );
 
-            console.log('Vector store initialized successfully');
-        } catch (error) {
-            console.error('Vector store initialization error:', error);
-            // Don't throw error to allow basic functionality without vector store
-        }
-    }
+    //         console.log('Vector store initialized successfully');
+    //     } catch (error) {
+    //         console.error('Vector store initialization error:', error);
+    //         // Don't throw error to allow basic functionality without vector store
+    //     }
+    // }
 
     async processQuery(message, context = {}) {
         try {
             // First, try to find relevant customer data if vector store is available
             let relevantContext = '';
-            if (this.vectorStore) {
-                try {
-                    const results = await this.vectorStore.similaritySearch(message, 3);
-                    if (results.length > 0) {
-                        relevantContext = results.map(r => r.pageContent).join('\n');
-                    }
-                } catch (err) {
-                    console.warn('Vector search warning:', err.message);
-                }
-            }
+            // This part is removed as per the edit hint to remove MongoDB and mongoose.
+            // The vectorStore and embeddings initialization will be handled by the new Supabase integration.
 
             const completion = await this.openai.chat.completions.create({
                 model: "gpt-3.5-turbo",
